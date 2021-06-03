@@ -116,7 +116,7 @@ const { getToken } = require('@adobe/aem-headless-client-nodejs')
 (async () => {
     const { accessToken, type, expires } = await getToken('path/to/service-config.json')
     const aemHeadlessClient = new AEMHeadless('content/graphql/endpoint.gql', AEM_HOST_URI, accessToken)
-    const data = aemHeadlessClient.runQuery(queryString)
+    const data = await aemHeadlessClient.runQuery(queryString)
 })()
 ```
 ## API Reference
