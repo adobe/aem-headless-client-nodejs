@@ -30,7 +30,7 @@ beforeAll(() => {
 
 test('AUTH: should throw without params', () => {
   const promise = getToken()
-  return expect(promise).rejects.toThrow('The "path" argument must be of type string. Received undefined')
+  return expect(promise).rejects.toThrow('The "path" argument must be of type string. Received')
 })
 
 test('AUTH: should throw with invalid path', () => {
