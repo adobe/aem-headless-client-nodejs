@@ -4,7 +4,7 @@
   },
   "bundleDependencies": false,
   "dependencies": {
-    "@adobe/aem-headless-client-js": "^2.1.1",
+    "@adobe/aem-headless-client-js": "^3.0.0",
     "@adobe/aemcs-api-client-lib": "git+https://github.com/adobe/aemcs-api-client-lib.git#main",
     "cross-fetch": "^3.0.6"
   },
