@@ -9,46 +9,41 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const fs = require('fs')
-const path = require('path')
+const config = require('@adobe/aio-lib-core-config')
 const exchange = require('@adobe/aemcs-api-client-lib')
 const { SDKError } = require('./errors')
 
 /**
  * Returns a Promise that resolves with a credentials JSON data.
  *
- * @param {string} credentialsFilePath - credentials config file path (serviceToken or devToken content)
+ * @param {string} aioConfigKey - aio config key
  * @returns {Promise<any>} the response body wrapped inside a Promise
  */
-async function getToken (credentialsFilePath) {
-  let authFileContent = ''
+async function getToken (aioConfigKey) {
+  const configString = config.get(aioConfigKey)
 
-  try {
-    const filePath = path.isAbsolute(credentialsFilePath) ? credentialsFilePath : path.join(process.cwd(), credentialsFilePath)
-    authFileContent = fs.readFileSync(filePath, 'utf8')
-  } catch (error) {
-    const { name, message, details } = error
-    throw new SDKError(name, 'readFileSync', '', message, details)
+  if (!configString) {
+    console.log('config not found')
+    return
   }
 
-  let config = null
+  let serviceToken = null
   try {
-    config = JSON.parse(authFileContent)
+    serviceToken = JSON.parse(configString)
   } catch (error) {
-    const { name, message, details } = error
-    throw new SDKError(name, 'JSON.parse', '', message, details)
+    console.log('not parsed')
   }
 
-  if (config.accessToken) {
-    // If config has DEV token
+  if (!serviceToken) {
+    // Treat config as a DEV token
     return {
-      accessToken: config.accessToken,
+      accessToken: configString,
       type: 'Bearer',
       expires: 24 * 60 * 60 * 1000
     }
   }
 
-  return exchange(config)
+  return exchange(serviceToken)
     .then(data => {
       return {
         accessToken: data.access_token,
