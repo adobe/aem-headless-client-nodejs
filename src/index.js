@@ -9,7 +9,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const fetch = require('cross-fetch')
+const fetchRetry = require('@adobe/aio-lib-core-networking')
 const AEMHeadlessApi = require('@adobe/aem-headless-client-js') // eslint-disable-line
 const getToken = require('./utils/auth')
 
@@ -29,9 +29,10 @@ class AEMHeadless extends AEMHeadlessApi {
    * @param {string} [config.serviceURL] - AEM server URL
    * @param {string} [config.endpoint] - GraphQL endpoint
    * @param {(string|Array)} [config.auth] - Bearer token string or [user,pass] pair array
-   * @param {object} [config.fetch] - custom Fetch instance - default cross-fetch
+   * @param {object} [config.fetch] - custom Fetch instance - default @adobe/aio-lib-core-networking
    */
   constructor (config) {
+    const fetch = config.fetch || fetchRetry.exponentialBackoff.bind(fetchRetry)
     let extendedConfig = {
       fetch
     }
