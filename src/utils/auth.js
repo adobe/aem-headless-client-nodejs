@@ -12,7 +12,8 @@ governing permissions and limitations under the License.
 const fs = require('fs')
 const path = require('path')
 const exchange = require('@adobe/aemcs-api-client-lib')
-const { SDKError } = require('./errors')
+const { ErrorCodes } = require('@adobe/aem-headless-client-js')
+const { AUTH_FILE_READ_ERROR, AUTH_FILE_PARSE_ERROR, EXCHANGE_TOKEN_ERROR } = ErrorCodes
 
 /**
  * Returns a Promise that resolves with a credentials JSON data.
@@ -27,16 +28,18 @@ async function getToken (credentialsFilePath) {
     const filePath = path.isAbsolute(credentialsFilePath) ? credentialsFilePath : path.join(process.cwd(), credentialsFilePath)
     authFileContent = fs.readFileSync(filePath, 'utf8')
   } catch (error) {
-    const { name, message, details } = error
-    throw new SDKError(name, 'readFileSync', '', message, details)
+    throw new AUTH_FILE_READ_ERROR({
+      messageValues: error.message
+    })
   }
 
   let config = null
   try {
     config = JSON.parse(authFileContent)
   } catch (error) {
-    const { name, message, details } = error
-    throw new SDKError(name, 'JSON.parse', '', message, details)
+    throw new AUTH_FILE_PARSE_ERROR({
+      messageValues: error.message
+    })
   }
 
   if (config.accessToken) {
@@ -57,8 +60,9 @@ async function getToken (credentialsFilePath) {
       }
     })
     .catch(error => {
-      const { name, type, message, details } = error
-      throw new SDKError(name, type || 'Exchange Token', '', message, details)
+      throw new EXCHANGE_TOKEN_ERROR({
+        messageValues: error.message
+      })
     })
 }
 
