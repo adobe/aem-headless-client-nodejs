@@ -65,7 +65,7 @@ For granular params, use config object
     <td>[config.auth]</td><td><code>string</code> | <code>Array</code></td><td><p>Bearer token string or [user,pass] pair array</p>
 </td>
     </tr><tr>
-    <td>[config.fetch]</td><td><code>object</code></td><td><p>custom Fetch instance - default cross-fetch</p>
+    <td>[config.fetch]</td><td><code>object</code></td><td><p>custom Fetch instance - default @adobe/aio-lib-core-networking</p>
 </td>
     </tr>  </tbody>
 </table>

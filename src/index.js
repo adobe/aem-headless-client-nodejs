@@ -9,7 +9,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const fetchRetry = require('@adobe/aio-lib-core-networking')
+const { HttpExponentialBackoff } = require('@adobe/aio-lib-core-networking')
 const AEMHeadlessApi = require('@adobe/aem-headless-client-js') // eslint-disable-line
 const getToken = require('./utils/auth')
 
@@ -32,6 +32,7 @@ class AEMHeadless extends AEMHeadlessApi {
    * @param {object} [config.fetch] - custom Fetch instance - default @adobe/aio-lib-core-networking
    */
   constructor (config) {
+    const fetchRetry = new HttpExponentialBackoff()
     const fetch = config.fetch || fetchRetry.exponentialBackoff.bind(fetchRetry)
     let extendedConfig = {
       fetch

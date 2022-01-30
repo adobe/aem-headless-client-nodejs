@@ -4,9 +4,9 @@
   },
   "bundleDependencies": false,
   "dependencies": {
-    "@adobe/aem-headless-client-js": "^3.1.0",
+    "@adobe/aem-headless-client-js": "^3.1.1",
     "@adobe/aemcs-api-client-lib": "git+https://github.com/adobe/aemcs-api-client-lib.git#main",
-    "@adobe/aio-lib-core-networking": "^1.0.1",
+    "@adobe/aio-lib-core-networking": "^2.0.0",
     "@adobe/aio-lib-core-logging": "^1.2.0"
   },
   "deprecated": false,
