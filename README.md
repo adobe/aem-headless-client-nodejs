@@ -51,7 +51,7 @@ const aemHeadlessClient = new AEMHeadless({
 
 #### Promise syntax:
 ```javascript
-aemHeadlessClient.postQuery(queryString)
+aemHeadlessClient.runQuery(queryString)
   .then(data => console.log(data))
   .catch(e => console.error(e.toJSON()))
 
@@ -72,7 +72,7 @@ aemHeadlessClient.runPersistedQuery('wknd/persist-query-name')
 (async () => {
     let postData
     try {
-        postData = await aemHeadlessClient.postQuery(queryString)
+        postData = await aemHeadlessClient.runQuery(queryString)
     } catch (e) {
         console.error(e.toJSON())
     }
@@ -98,6 +98,10 @@ aemHeadlessClient.runPersistedQuery('wknd/persist-query-name')
     }
 })()    
 ```
+
+## Fetch instance
+
+Check https://github.com/adobe/aio-lib-core-networking for advanced usage and default settings
 
 ## Authorization
 
