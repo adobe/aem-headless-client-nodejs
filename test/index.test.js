@@ -20,5 +20,5 @@ test('SDK Constructor: string as a constructor param is used as serviceURL', () 
 test('SDK Constructor: Fetch is not required param "config.fetch"', () => {
   const config = {}
   sdk = new AEMHeadless(config)
-  expect(sdk).toHaveProperty('fetch', fetch)
+  expect(sdk).toHaveProperty('fetch')
 })

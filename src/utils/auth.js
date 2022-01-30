@@ -11,7 +11,10 @@ governing permissions and limitations under the License.
 
 const config = require('@adobe/aio-lib-core-config')
 const exchange = require('@adobe/aemcs-api-client-lib')
-const { SDKError } = require('./errors')
+const { ErrorCodes } = require('@adobe/aem-headless-client-js')
+const { AUTH_FILE_PARSE_ERROR, EXCHANGE_TOKEN_ERROR } = ErrorCodes
+const loggerNamespace = 'aem-headless-client-nodejs'
+const logger = require('@adobe/aio-lib-core-logging')(loggerNamespace, { level: process.env.LOG_LEVEL })
 
 /**
  * Returns a Promise that resolves with a credentials JSON data.
@@ -22,16 +25,15 @@ const { SDKError } = require('./errors')
 async function getToken (aioConfigKey) {
   const configString = config.get(aioConfigKey)
 
-  if (!configString) {
-    console.log('config not found')
-    return
-  }
-
   let serviceToken = null
   try {
     serviceToken = JSON.parse(configString)
+    logger.debug('auth file parsed successfully')
   } catch (error) {
-    console.log('not parsed')
+    logger.debug('auth file parse error', error)
+    throw new AUTH_FILE_PARSE_ERROR({
+      messageValues: error.message
+    })
   }
 
   if (!serviceToken) {
@@ -45,6 +47,7 @@ async function getToken (aioConfigKey) {
 
   return exchange(serviceToken)
     .then(data => {
+      logger.debug('exchange token success')
       return {
         accessToken: data.access_token,
         type: data.token_type,
@@ -52,8 +55,10 @@ async function getToken (aioConfigKey) {
       }
     })
     .catch(error => {
-      const { name, type, message, details } = error
-      throw new SDKError(name, type || 'Exchange Token', '', message, details)
+      logger.debug('exchange token error', error)
+      throw new EXCHANGE_TOKEN_ERROR({
+        messageValues: error.message
+      })
     })
 }
 
