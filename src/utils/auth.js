@@ -14,6 +14,8 @@ const path = require('path')
 const exchange = require('@adobe/aemcs-api-client-lib')
 const { ErrorCodes } = require('@adobe/aem-headless-client-js')
 const { AUTH_FILE_READ_ERROR, AUTH_FILE_PARSE_ERROR, EXCHANGE_TOKEN_ERROR } = ErrorCodes
+const loggerNamespace = 'aem-headless-client-nodejs'
+const logger = require('@adobe/aio-lib-core-logging')(loggerNamespace, { level: process.env.LOG_LEVEL })
 
 /**
  * Returns a Promise that resolves with a credentials JSON data.
@@ -27,7 +29,9 @@ async function getToken (credentialsFilePath) {
   try {
     const filePath = path.isAbsolute(credentialsFilePath) ? credentialsFilePath : path.join(process.cwd(), credentialsFilePath)
     authFileContent = fs.readFileSync(filePath, 'utf8')
+    logger.debug('auth file read successfully')
   } catch (error) {
+    logger.debug('auth file read error', error)
     throw new AUTH_FILE_READ_ERROR({
       messageValues: error.message
     })
@@ -36,7 +40,9 @@ async function getToken (credentialsFilePath) {
   let config = null
   try {
     config = JSON.parse(authFileContent)
+    logger.debug('auth file parsed successfully')
   } catch (error) {
+    logger.debug('auth file parse error', error)
     throw new AUTH_FILE_PARSE_ERROR({
       messageValues: error.message
     })
@@ -53,6 +59,7 @@ async function getToken (credentialsFilePath) {
 
   return exchange(config)
     .then(data => {
+      logger.debug('exchange token success')
       return {
         accessToken: data.access_token,
         type: data.token_type,
@@ -60,6 +67,7 @@ async function getToken (credentialsFilePath) {
       }
     })
     .catch(error => {
+      logger.debug('exchange token error', error)
       throw new EXCHANGE_TOKEN_ERROR({
         messageValues: error.message
       })
