@@ -71,7 +71,7 @@ test('e2e test persistQuery API Success', () => {
 
 test('e2e test persistQuery API Error', () => {
   // check error response
-  const promise = sdk.persistQuery(queryString, existingQueryName)
+  const promise = sdk.persistQuery(queryString, existingQueryName, {}, { maxRetries: 0 })
   return expect(promise).rejects.toThrow()
 })
 
@@ -88,7 +88,7 @@ test('e2e test runQuery API Success', () => {
 
 test('e2e test runQuery API Error', () => {
   // check error response
-  const promise = sdk.runQuery()
+  const promise = sdk.runQuery('', {}, { maxRetries: 0 })
   return expect(promise).rejects.toThrow()
 })
 
@@ -100,6 +100,6 @@ test('e2e test runPersistedQuery API Success', () => {
 
 test('e2e test runPersistedQuery API Error', () => {
   // check error response
-  const promise = sdk.runPersistedQuery('/test')
+  const promise = sdk.runPersistedQuery('test', {}, {}, { maxRetries: 0 })
   return expect(promise).rejects.toThrow()
 })
