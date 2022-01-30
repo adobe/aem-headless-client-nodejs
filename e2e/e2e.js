@@ -29,6 +29,7 @@ const queryString = `
 `
 let sdk = {}
 const persistedName = 'wknd/persist-query-name'
+const existingQueryName = 'wknd/adventures-all'
 
 beforeEach(() => {
   sdk = new AEMHeadless({
@@ -70,7 +71,7 @@ test('e2e test persistQuery API Success', () => {
 
 test('e2e test persistQuery API Error', () => {
   // check error response
-  const promise = sdk.persistQuery(queryString, persistedName)
+  const promise = sdk.persistQuery(queryString, existingQueryName)
   return expect(promise).rejects.toThrow()
 })
 
@@ -93,7 +94,7 @@ test('e2e test runQuery API Error', () => {
 
 test('e2e test runPersistedQuery API Success', () => {
   // check success response
-  const promise = sdk.runPersistedQuery(persistedName)
+  const promise = sdk.runPersistedQuery(existingQueryName)
   return expect(promise).resolves.toBeTruthy()
 })
 
