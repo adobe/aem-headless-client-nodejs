@@ -15,13 +15,13 @@ jobs:
     name: checkout
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
       - run: |
           npm install
           npm test
@@ -30,8 +30,7 @@ jobs:
         run: |
           npm version ${{ github.event.inputs.level }}
           git push
-      - uses: JS-DevTools/npm-publish@v1
+      - uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
           tag: ${{ github.event.inputs.tag }}
-          access: 'public'
