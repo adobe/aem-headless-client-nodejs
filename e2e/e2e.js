@@ -28,8 +28,8 @@ const queryString = `
 }
 `
 let sdk = {}
-const persistedName = 'wknd/persist-query-name'
-const existingQueryName = 'wknd/adventures-all'
+const persistedName = 'wknd-shared/persist-query-name'
+const existingQueryName = 'wknd-shared/adventures-all'
 
 beforeEach(() => {
   sdk = new AEMHeadless({
