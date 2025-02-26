@@ -6,7 +6,7 @@
     "@adobe/aem-headless-client-js": "4.0.0",
     "@adobe/aemcs-api-client-lib": "git+https://github.com/adobe/aemcs-api-client-lib.git#main",
     "@adobe/aio-lib-core-logging": "3.0.2",
-    "@adobe/aio-lib-core-networking": "5.0.3"
+    "@adobe/aio-lib-core-networking": "5.0.4"
   },
   "deprecated": false,
   "description": "AEM Headless SDK Client NodeJS",
