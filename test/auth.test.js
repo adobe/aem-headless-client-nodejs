@@ -10,21 +10,19 @@ governing permissions and limitations under the License.
 */
 const fs = require('fs')
 jest.mock('fs')
-jest.setMock('@adobe/aemcs-api-client-lib', async (data) => {
-  return new Promise((resolve, reject) => {
-    if (data && data.serviceToken) {
-      resolve(data)
-    } else {
-      reject(Error('aemcs error'))
-    }
-  })
-})
+jest.mock('jsonwebtoken')
+jest.mock('https')
 
 const { getToken } = require('../src')
 
 // /////////////////////////////////////////////
 beforeAll(() => {
   fs.writeFileSync.mockClear()
+  fs.readFileSync.mockReturnValue('{ "accessToken": "test" }')
+})
+
+beforeEach(() => {
+  jest.clearAllMocks()
   fs.readFileSync.mockReturnValue('{ "accessToken": "test" }')
 })
 
@@ -50,18 +48,79 @@ test('AUTH: should throw with invalid file content', () => {
 })
 
 test('AUTH: should throw with invalid service token data', () => {
+  const jwt = require('jsonwebtoken')
+  jwt.sign.mockImplementation(() => {
+    throw new Error('Invalid private key')
+  })
+  
   fs.readFileSync.mockReturnValue(`{
-    "serviceToken": false
+    "integration": {
+      "imsEndpoint": "ims-na1.adobelogin.com",
+      "metascopes": "ent_aem_cloud_sdk",
+      "technicalAccount": {
+        "clientId": "test_client_id",
+        "clientSecret": "test_client_secret"
+      },
+      "id": "test@techacct.adobe.com",
+      "org": "test@AdobeOrg",
+      "privateKey": "invalid-key"
+    }
   }`)
   const promise = getToken('test')
-  return expect(promise).rejects.toThrow('aemcs error')
+  return expect(promise).rejects.toThrow()
 })
 
 test('AUTH: should use service token', () => {
+  const https = require('https')
+  const jwt = require('jsonwebtoken')
+  
+  // Mock jwt.sign to return a dummy token
+  jwt.sign.mockReturnValue('mock-jwt-token')
+  
+  // Mock https.request
+  const mockRequest = {
+    on: jest.fn(),
+    write: jest.fn(),
+    end: jest.fn()
+  }
+  
+  https.request.mockImplementation((options, callback) => {
+    // Simulate successful response
+    process.nextTick(() => {
+      const mockResponse = {
+        statusCode: 200,
+        setEncoding: jest.fn(),
+        on: jest.fn((event, handler) => {
+          if (event === 'data') {
+            handler('{"access_token":"test_token","token_type":"Bearer","expires_in":3600}')
+          } else if (event === 'end') {
+            handler()
+          }
+        })
+      }
+      callback(mockResponse)
+    })
+    return mockRequest
+  })
+
   fs.readFileSync.mockReturnValue(`{
-    "serviceToken": true,
-    "access_token": "test"
+    "integration": {
+      "imsEndpoint": "ims-na1.adobelogin.com",
+      "metascopes": "ent_aem_cloud_sdk",
+      "technicalAccount": {
+        "clientId": "test_client_id",
+        "clientSecret": "test_client_secret"
+      },
+      "id": "test@techacct.adobe.com",
+      "org": "test@AdobeOrg",
+      "privateKey": "-----BEGIN RSA PRIVATE KEY-----\\nMIIEpAIBAAKCAQEA\\n-----END RSA PRIVATE KEY-----"
+    }
   }`)
+
   const promise = getToken('test')
-  return expect(promise).resolves.toBeTruthy()
+  return expect(promise).resolves.toEqual({
+    accessToken: 'test_token',
+    type: 'Bearer',
+    expires: 3600
+  })
 })
