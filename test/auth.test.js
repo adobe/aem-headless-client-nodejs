@@ -52,7 +52,7 @@ test('AUTH: should throw with invalid service token data', () => {
   jwt.sign.mockImplementation(() => {
     throw new Error('Invalid private key')
   })
-  
+
   fs.readFileSync.mockReturnValue(`{
     "integration": {
       "imsEndpoint": "ims-na1.adobelogin.com",
@@ -73,17 +73,17 @@ test('AUTH: should throw with invalid service token data', () => {
 test('AUTH: should use service token', () => {
   const https = require('https')
   const jwt = require('jsonwebtoken')
-  
+
   // Mock jwt.sign to return a dummy token
   jwt.sign.mockReturnValue('mock-jwt-token')
-  
+
   // Mock https.request
   const mockRequest = {
     on: jest.fn(),
     write: jest.fn(),
     end: jest.fn()
   }
-  
+
   https.request.mockImplementation((options, callback) => {
     // Simulate successful response
     process.nextTick(() => {
