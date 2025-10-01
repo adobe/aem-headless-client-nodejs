@@ -26,11 +26,11 @@ beforeAll(() => {
 beforeEach(() => {
   jest.clearAllMocks()
   fs.readFileSync.mockReturnValue('{ "accessToken": "test" }')
-  
+
   // Reset module mocks
   const jwt = require('jsonwebtoken')
   const https = require('https')
-  
+
   jwt.sign.mockClear()
   https.request.mockClear()
 })
@@ -58,7 +58,7 @@ test('AUTH: should throw with invalid file content', () => {
 
 test('AUTH: should throw with invalid service token data', () => {
   const jwt = require('jsonwebtoken')
-  
+
   // Mock jwt.sign to throw an error
   jwt.sign.mockImplementation(() => {
     throw new Error('secretOrPrivateKey must be an asymmetric key when using RS256')
@@ -77,7 +77,7 @@ test('AUTH: should throw with invalid service token data', () => {
       "privateKey": "invalid-key"
     }
   }`)
-  
+
   const promise = getToken('test')
   return expect(promise).rejects.toThrow('secretOrPrivateKey must be an asymmetric key when using RS256')
 })
@@ -108,7 +108,7 @@ test('AUTH: should use service token', () => {
         }
       })
     }
-    
+
     // Call callback synchronously to avoid timeout
     callback(mockResponse)
     return mockRequest
