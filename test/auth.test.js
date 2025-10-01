@@ -9,6 +9,8 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 const fs = require('fs')
+
+// Mock modules before requiring the main module
 jest.mock('fs')
 jest.mock('jsonwebtoken')
 jest.mock('https')
@@ -24,6 +26,13 @@ beforeAll(() => {
 beforeEach(() => {
   jest.clearAllMocks()
   fs.readFileSync.mockReturnValue('{ "accessToken": "test" }')
+  
+  // Reset module mocks
+  const jwt = require('jsonwebtoken')
+  const https = require('https')
+  
+  jwt.sign.mockClear()
+  https.request.mockClear()
 })
 
 test('AUTH: should throw without params', () => {
@@ -49,8 +58,10 @@ test('AUTH: should throw with invalid file content', () => {
 
 test('AUTH: should throw with invalid service token data', () => {
   const jwt = require('jsonwebtoken')
+  
+  // Mock jwt.sign to throw an error
   jwt.sign.mockImplementation(() => {
-    throw new Error('Invalid private key')
+    throw new Error('secretOrPrivateKey must be an asymmetric key when using RS256')
   })
 
   fs.readFileSync.mockReturnValue(`{
@@ -66,8 +77,9 @@ test('AUTH: should throw with invalid service token data', () => {
       "privateKey": "invalid-key"
     }
   }`)
+  
   const promise = getToken('test')
-  return expect(promise).rejects.toThrow()
+  return expect(promise).rejects.toThrow('secretOrPrivateKey must be an asymmetric key when using RS256')
 })
 
 test('AUTH: should use service token', () => {
@@ -85,21 +97,20 @@ test('AUTH: should use service token', () => {
   }
 
   https.request.mockImplementation((options, callback) => {
-    // Simulate successful response
-    process.nextTick(() => {
-      const mockResponse = {
-        statusCode: 200,
-        setEncoding: jest.fn(),
-        on: jest.fn((event, handler) => {
-          if (event === 'data') {
-            handler('{"access_token":"test_token","token_type":"Bearer","expires_in":3600}')
-          } else if (event === 'end') {
-            handler()
-          }
-        })
-      }
-      callback(mockResponse)
-    })
+    const mockResponse = {
+      statusCode: 200,
+      setEncoding: jest.fn(),
+      on: jest.fn((event, handler) => {
+        if (event === 'data') {
+          handler('{"access_token":"test_token","token_type":"Bearer","expires_in":3600}')
+        } else if (event === 'end') {
+          handler()
+        }
+      })
+    }
+    
+    // Call callback synchronously to avoid timeout
+    callback(mockResponse)
     return mockRequest
   })
 
