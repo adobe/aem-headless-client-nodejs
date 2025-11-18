@@ -5,7 +5,7 @@
   "dependencies": {
     "@adobe/aem-headless-client-js": "4.0.0",
     "@adobe/aio-lib-core-logging": "3.0.2",
-    "@adobe/aio-lib-core-networking": "5.0.4",
+    "@adobe/aio-lib-core-networking": "5.1.0",
     "jsonwebtoken": "^9.0.2"
   },
   "deprecated": false,
