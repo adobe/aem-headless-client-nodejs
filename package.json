@@ -11,7 +11,7 @@
   "deprecated": false,
   "description": "AEM Headless SDK Client NodeJS",
   "devDependencies": {
-    "@adobe/eslint-config-aio-lib-config": "4.0.0",
+    "@adobe/eslint-config-aio-lib-config": "5.0.0",
     "dotenv": "17.4.2",
     "jest": "30.3.0",
     "jest-fetch-mock": "3.0.3",
